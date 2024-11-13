@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アスキーシューティングゲーム</title>
+    <style>
+        body { font-family: monospace; }
+    </style>
+</head>
+<body>
+    <pre id="game"></pre>
+    <p>←→キーで移動、スペースキーで弾を発射</p>
+
+    <script>
+        const width = 20;
+        const height = 20;
+        let playerPos = Math.floor(width / 2);
+        let bullets = [];
+        let enemies = [];
+        let score = 0;
+
+        // ゲームの初期化
+        function initGame() {
+            playerPos = Math.floor(width / 2);
+            bullets = [];
+            enemies = [];
+            score = 0;
+            spawnEnemy();
+            drawGame();
+        }
+
+        // 敵をランダムに生成
+        function spawnEnemy() {
+            const enemyPos = Math.floor(Math.random() * width);
+            enemies.push({ x: enemyPos, y: 0 });
+        }
+
+        // ゲームの描画
+        function drawGame() {
+            let display = "";
+
+            // ゲームフィールド
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    if (y === height - 1 && x === playerPos) {
+                        display += "A"; // プレイヤー
+                    } else if (bullets.some(b => b.x === x && b.y === y)) {
+                        display += "|"; // 弾
+                    } else if (enemies.some(e => e.x === x && e.y === y)) {
+                        display += "X"; // 敵
+                    } else {
+                        display += " ";
+                    }
+                }
+                display += "\n";
+            }
+
+            display += `Score: ${score}\n`;
+            document.getElementById("game").innerText = display;
+        }
+
+        // 弾の移動
+        function moveBullets() {
+            bullets = bullets.map(b => ({ x: b.x, y: b.y - 1 })).filter(b => b.y >= 0);
+        }
+
+        // 敵の移動
+        function moveEnemies() {
+            enemies = enemies.map(e => ({ x: e.x, y: e.y + 1 }));
+
+            // 敵が最下段に達したらゲームオーバー
+            if (enemies.some(e => e.y >= height - 1)) {
+                alert("ゲームオーバー！スコア: " + score);
+                initGame();
+            }
+        }
+
+        // 弾と敵の衝突判定
+        function checkCollisions() {
+            bullets.forEach((bullet, bulletIndex) => {
+                enemies.forEach((enemy, enemyIndex) => {
+                    if (bullet.x === enemy.x && bullet.y === enemy.y) {
+                        bullets.splice(bulletIndex, 1);
+                        enemies.splice(enemyIndex, 1);
+                        score++;
+                    }
+                });
+            });
+        }
+
+        // キーボード操作
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowLeft" && playerPos > 0) {
+                playerPos--;
+            }
+            if (event.key === "ArrowRight" && playerPos < width - 1) {
+                playerPos++;
+            }
+            if (event.key === " ") {
+                bullets.push({ x: playerPos, y: height - 2 });
+            }
+            drawGame();
+        });
+
+        // ゲームループ
+        function gameLoop() {
+            moveBullets();
+            moveEnemies();
+            checkCollisions();
+            drawGame();
+
+            // 一定時間ごとに敵を追加
+            if (Math.random() < 0.1) {
+                spawnEnemy();
+            }
+
+            setTimeout(gameLoop, 200);
+        }
+
+        // ゲーム開始
+        initGame();
+        gameLoop();
+    </script>
+</body>
+</html>
