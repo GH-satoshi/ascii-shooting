@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>アスキーシューティングゲーム</title>
+    <title>ASCII SHOOTING GAME</title>
     <style>
         body {
             font-family: monospace;
@@ -14,7 +14,7 @@
 </head>
 <body>
     <pre id="game"></pre>
-    <p>←→キーで移動、スペースキーで弾を発射</p>
+    <p>[←][→]: いどう<br>[すぺーす]: はっしゃ</p>
 
     <script>
         const width = 20;
@@ -60,7 +60,7 @@
                 display += "\n";
             }
 
-            display += `Score: ${score}\n`;
+            display += `てんすう: ${score}\n`;
             document.getElementById("game").innerText = display;
         }
 
